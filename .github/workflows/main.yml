@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Generate swagger ui
+        uses: Legion2/swagger-ui-action@v1.1.2
+        with:
+          # Output path for the generated Swagger UI files
+          output: swagger-ui
+          # Swagger UI version
+          # A file containing the API definition
+          spec-file: swagger-doc.yml
+          # A swagger-config file which is copied and added to configUrl
+          # swagger-config-file: # optional
+          # An URL to a swagger-config file which is added to configUrl
+          # swagger-config-url: # optional
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: swagger-ui
