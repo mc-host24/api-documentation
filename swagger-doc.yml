@@ -1,0 +1,1629 @@
+openapi: 3.0.0
+info:
+  description: This is the official API documentation of the MC-HOST24 public api.
+  version: 1.0.0
+  title: MC-HOST24 Public API
+  termsOfService: 'https://mc-host24.de/agb'
+  contact:
+    email: sergej.kembel@mc-host24.de
+servers:
+  - description: Production API
+    url: 'https://mc-host24.de/api/v1'
+tags:
+  - name: Authentication
+    description: Authentication to API access
+  - name: Minecraft Server
+    description: Manage your Minecraftserver
+  - name: Teamspeak Server
+    description: Manage your Teamspeakserver
+  - name: Domain
+    description: Manage your Domain
+  - name: Rootserver
+    description: Manage your Rootserver
+  - name: User
+    description: Manage your Profile
+  - name: Ticketsystem
+    description: Manage our Tickets
+  - name: Service
+    description: Some information about your Service
+paths:
+  /token:
+    post:
+      summary: Get an API token
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        description: Login Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: MyAccountName
+                password:
+                  type: string
+                  example: My$ecr3TPa$$W0rD!
+                tfa:
+                  type: integer
+                  example: '123456'
+      responses:
+        '200':
+          description: Loginkey response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          api_token:
+                            type: string
+                            description: Your generated API Token
+  /logout:
+    post:
+      summary: Logout and invalidate the api token
+      operationId: logout
+      tags:
+        - Authentication
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Logout Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /minecraftServer:
+    get:
+      summary: Get all minecraft server
+      operationId: getAllMinecraftServer
+      tags:
+        - Minecraft Server
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: All Minecraftserver
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MinecraftServer'
+  '/minecraftServer/{minecraftServerId}/status':
+    get:
+      summary: Get the status of the minecraft server
+      operationId: getMinecraftServerStatus
+      tags:
+        - Minecraft Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/minecraftServerId'
+      responses:
+        '200':
+          description: All Minecraftserver
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MinecraftServer'
+  '/minecraftServer/{minecraftServerId}/start':
+    post:
+      summary: Start the minecraft server
+      operationId: postMinecraftServerStart
+      tags:
+        - Minecraft Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/minecraftServerId'
+      responses:
+        '200':
+          description: Start minecraft server response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/minecraftServer/{minecraftServerId}/stop':
+    post:
+      summary: Stop the minecraft server
+      operationId: postMinecraftServerStop
+      tags:
+        - Minecraft Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/minecraftServerId'
+      responses:
+        '200':
+          description: Stop minecraft server response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/minecraftServer/{minecraftServerId}/restart':
+    post:
+      summary: Restart the minecraft server
+      operationId: postMinecraftServerRestart
+      tags:
+        - Minecraft Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/minecraftServerId'
+      responses:
+        '200':
+          description: Restart minecraft server response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/minecraftServer/{minecraftServerId}/backups':
+    get:
+      summary: List minecraft server backups
+      operationId: getMinecraftServerBackups
+      tags:
+        - Minecraft Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/minecraftServerId'
+      responses:
+        '200':
+          description: All minecraft server backups response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MinecraftServerBackup'
+    post:
+      summary: Start new minecraft server backup
+      operationId: postMinecraftServerBackup
+      tags:
+        - Minecraft Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/minecraftServerId'
+      responses:
+        '200':
+          description: Start new minecraft server backup response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /teamspeak:
+    get:
+      summary: Get all teamspeak server
+      operationId: getTeamspeakServer
+      tags:
+        - Teamspeak Server
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: All teamspeak server
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TeamspeakServer'
+  '/teamspeak/{teamspeakServerId}/status':
+    get:
+      summary: Get teamspeak server status
+      operationId: getTeamspeakServerStatus
+      tags:
+        - Teamspeak Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/teamspeakServerId'
+      responses:
+        '200':
+          description: Teamspeak server status response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TeamspeakServer'
+  '/teamspeak/{teamspeakServerId}/start':
+    post:
+      summary: Start teamspeak server
+      operationId: postTeamspeakServerStart
+      tags:
+        - Teamspeak Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/teamspeakServerId'
+      responses:
+        '200':
+          description: Start teamspeak response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/teamspeak/{teamspeakServerId}/stop':
+    post:
+      summary: Stop teamspeak server
+      operationId: postTeamspeakServerStop
+      tags:
+        - Teamspeak Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/teamspeakServerId'
+      responses:
+        '200':
+          description: Stop teamspeak response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/teamspeak/{teamspeakServerId}/restart':
+    post:
+      summary: Restart teamspeak server
+      operationId: postTeamspeakServerRestart
+      tags:
+        - Teamspeak Server
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/teamspeakServerId'
+      responses:
+        '200':
+          description: Restart teamspeak response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /domain:
+    get:
+      summary: Get all Domains
+      operationId: getDomains
+      tags:
+        - Domain
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: All domains response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Domain'
+  /domain/availableRecords:
+    get:
+      summary: Get available dns record types
+      operationId: getDomainAvailableRecords
+      tags:
+        - Domain
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Available dns record types response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        example:
+                          A: A (IPv4)
+                          AAAA: AAAA (IPv6)
+                          CNAME: CNAME
+                          MX: MX
+                          NS: NS
+                          SRV: SRV
+                          TXT: TXT
+                          CAA: CAA
+                          HTTP_F: HTTP (Frame)
+                          HTTPS_F: HTTPS (Frame)
+                          HTTP_H: HTTP (Header)
+                          HTTPS_H: HTTPS (Header)
+  '/domain/{domainId}/info':
+    get:
+      summary: Get additional domain information
+      operationId: getDomainInfo
+      tags:
+        - Domain
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/domainId'
+      responses:
+        '200':
+          description: Domain info response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          domain:
+                            $ref: '#/components/schemas/Domain'
+                          records:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/DomainRecord'
+                          emails:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Domain'
+  '/domain/{domainId}/dns':
+    post:
+      summary: Create a new dns record
+      operationId: postDomainDnsRecord
+      tags:
+        - Domain
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/domainId'
+      requestBody:
+        description: Dns record payload
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainRecord'
+      responses:
+        '200':
+          description: Domain dns record
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DomainRecord'
+  '/domain/{domainId}/dns/{domainRecordId}':
+    delete:
+      summary: Delete a dns record
+      operationId: deleteDomainDnsRecord
+      tags:
+        - Domain
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/domainId'
+        - $ref: '#/components/parameters/domainRecordId'
+      responses:
+        '200':
+          description: Domain delete dns record response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/domain/{domainId}/email':
+    post:
+      summary: Create a new email
+      operationId: postDomainEmail
+      tags:
+        - Domain
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/domainId'
+      requestBody:
+        description: Domain email payload
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainEmail'
+      responses:
+        '200':
+          description: Domain email response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DomainEmail'
+  '/domain/{domainId}/dns/{domainEmailId}':
+    delete:
+      summary: Delete a domain email
+      operationId: deleteDomainEmail
+      tags:
+        - Domain
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/domainId'
+        - $ref: '#/components/parameters/domainEmailId'
+      responses:
+        '200':
+          description: Domain delete email response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /profile:
+    get:
+      summary: Get profile information
+      operationId: getProfile
+      tags:
+        - User
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: User profile response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+  '/service/{serviceId}/price':
+    get:
+      summary: Get service renew price
+      operationId: getServiceRenewPrice
+      tags:
+        - Service
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/serviceId'
+      responses:
+        '200':
+          description: Service renew price response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          runtimes:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                runtime:
+                                  type: string
+                                  description: Renew period
+                                  example: 30 days
+                                price:
+                                  type: number
+                                  format: float
+                                  description: Renew price for period
+                                  example: 27.1
+                          discount:
+                            $ref: '#/components/schemas/Discount'
+  '/service/{serviceId}/renew':
+    post:
+      summary: Renew service
+      operationId: postServiceRenew
+      tags:
+        - Service
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/serviceId'
+      requestBody:
+        description: Service renew payload
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                runtime:
+                  type: string
+                  example: 30 days
+      responses:
+        '200':
+          description: Renew service response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /vserver:
+    get:
+      summary: Get all Rootserver
+      operationId: getRootserver
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: All rootserver response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RootServer'
+  '/vserver/{rootserverId}/status':
+    get:
+      summary: Get Rootserver Status
+      operationId: getRootserverStatus
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+      responses:
+        '200':
+          description: Rootserver status response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RootServer'
+  '/vserver/{rootserverId}/start':
+    post:
+      summary: Start Rootserver
+      operationId: postRootserverStart
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+      responses:
+        '200':
+          description: Start rootserver
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/vserver/{rootserverId}/shutdown':
+    post:
+      summary: Shutdown Rootserver
+      operationId: postRootserverShutdown
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+      responses:
+        '200':
+          description: Shutdown rootserver Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/vserver/{rootserverId}/stop':
+    post:
+      summary: Stop Rootserver
+      operationId: postRootserverStop
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+      responses:
+        '200':
+          description: Stop rootserver Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/vserver/{rootserverId}/restart':
+    post:
+      summary: Restart Rootserver
+      operationId: postRootserverRestart
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+      responses:
+        '200':
+          description: Restart rootserver Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/vserver/{rootserverId}/backups':
+    get:
+      summary: Get Rootserver Backups
+      operationId: getRootserverBackups
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+      responses:
+        '200':
+          description: Rootserver Backups Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RootserverBackup'
+    post:
+      summary: Create new Rootserver Backup
+      operationId: postRootserverBackup
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+      responses:
+        '200':
+          description: Rootserver Backup Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/vserver/{rootserverId}/restore/{rootserverBackupId}':
+    post:
+      summary: Restore Rootserver Backup
+      operationId: postRootserverBackupRestore
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+        - $ref: '#/components/parameters/rootserverBackupId'
+      responses:
+        '200':
+          description: Rootserver Backups Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/vserver/{rootserverId}/backup/{rootserverBackupId}/delete':
+    post:
+      summary: Delete Rootserver Backup
+      operationId: postRootserverBackupDelete
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+        - $ref: '#/components/parameters/rootserverBackupId'
+      responses:
+        '200':
+          description: Rootserver Backup delete Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/vserver/{rootserverId}/vnc':
+    get:
+      summary: Get Rootserver VNC Console
+      operationId: getRootserverVnc
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+      responses:
+        '200':
+          description: Rootserver Vnc Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          url:
+                            type: string
+  '/vserver/{rootserverId}/rrddata':
+    get:
+      summary: Get Rootserver stats
+      operationId: getRootserverRrddata
+      tags:
+        - Rootserver
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/rootserverId'
+        - in: query
+          name: tf
+          schema:
+            type: string
+            enum:
+              - hour
+              - day
+              - week
+              - month
+              - year
+            example: year
+          required: true
+      responses:
+        '200':
+          description: Rootserver rrd response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          time:
+                            type: array
+                            items:
+                              type: string
+                          cpu:
+                            type: array
+                            items:
+                              type: number
+                          mem:
+                            type: array
+                            items:
+                              type: number
+                          diskread:
+                            type: array
+                            items:
+                              type: number
+                          diskwrite:
+                            type: array
+                            items:
+                              type: number
+                          netin:
+                            type: array
+                            items:
+                              type: number
+                          netout:
+                            type: array
+                            items:
+                              type: number
+                          maxmem:
+                            type: number
+  /support/tickets/info:
+    get:
+      summary: Get ticketsystem info
+      operationId: getTicketInfo
+      tags:
+        - Ticketsystem
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Ticketsystem info response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TicketCategory'
+                  canCreateTicket:
+                    type: boolean
+                  services:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+  /support/tickets:
+    get:
+      summary: Get tickets
+      operationId: getTickets
+      tags:
+        - Ticketsystem
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Tickets response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Ticket'
+    post:
+      summary: Create new ticket
+      operationId: postTicket
+      tags:
+        - Ticketsystem
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        description: New ticket payload
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - betr
+                - text
+                - service
+                - ticket_category_id
+              properties:
+                betr:
+                  type: string
+                text:
+                  type: string
+                service:
+                  type: integer
+                ticket_category_id:
+                  type: integer
+      responses:
+        '200':
+          description: New ticket response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Ticket'
+  '/support/tickets/{ticketId}':
+    get:
+      summary: Get ticket
+      operationId: getTicket
+      tags:
+        - Ticketsystem
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ticketId'
+      responses:
+        '200':
+          description: Ticket response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Ticket'
+  '/support/tickets/{ticketId}/reply':
+    post:
+      summary: Reply to ticket
+      operationId: postTicketReply
+      tags:
+        - Ticketsystem
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ticketId'
+      requestBody:
+        description: Ticket reply payload
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reply
+              properties:
+                reply:
+                  type: string
+      responses:
+        '200':
+          description: Ticket response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/support/tickets/{ticketId}/reopen':
+    post:
+      summary: Reopen the ticket
+      operationId: postTicketReopen
+      tags:
+        - Ticketsystem
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ticketId'
+      responses:
+        '200':
+          description: Ticket reopen response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  '/support/tickets/{ticketId}/close':
+    post:
+      summary: Close the ticket
+      operationId: postTicketClose
+      tags:
+        - Ticketsystem
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ticketId'
+      responses:
+        '200':
+          description: Ticket close response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Return of the api
+        status:
+          type: string
+          description: Status of api response
+          example: SUCCESS
+        meta:
+          type: object
+          description: Translated messages used in messages
+          properties:
+            warnings:
+              type: array
+              items:
+                type: string
+            errors:
+              type: array
+              items:
+                type: string
+            success:
+              type: array
+              items:
+                type: string
+        success:
+          type: boolean
+          description: Value of whether the request was executed correctly
+          example: true
+        messages:
+          type: array
+          items:
+            type: string
+          description: All messages transmitted by the api
+        reload_datatables:
+          type: boolean
+          description: Value of whether datatables should be reloaded or not
+          example: false
+        reload:
+          type: boolean
+          description: Value of whether site should be reloaded or not
+          example: false
+    MinecraftServer:
+      allOf:
+        - $ref: '#/components/schemas/Product'
+        - $ref: '#/components/schemas/ProductName'
+        - type: object
+          properties:
+            multicraft_id:
+              type: integer
+              description: The multicraft panel id
+              example: 1
+            address:
+              type: string
+              description: The ipv4 address of the minecraft server with port
+              example: 128.0.0.138
+            memory:
+              type: integer
+              description: Memory in Mebibyte
+              example: 1024
+            online:
+              type: boolean
+              description: Current status of minecraft server
+              example: true
+            players_online:
+              type: integer
+              description: Current online players on minecraft server
+              example: 5
+            players_max:
+              type: integer
+              description: Maximal online players on minecraft server
+              example: 10
+            cpu_usage:
+              type: integer
+              description: Current cpu usage of minecraft-server in percentage
+              example: 27
+            mem_usage:
+              type: integer
+              description: Current memory usage of minecraft-server in percentage
+              example: 80
+    RootServer:
+      allOf:
+        - $ref: '#/components/schemas/Product'
+        - $ref: '#/components/schemas/ProductName'
+        - type: object
+          properties:
+            cores:
+              type: integer
+              description: Rootserver cores
+              example: 12
+            memory:
+              type: integer
+              description: Rootserver memory in Mebibyte
+              example: 49152
+            disk_size:
+              type: integer
+              description: Rootserver disk in Gibibyte
+              example: 100
+            installed:
+              type: integer
+              description: Value of whether the server is installed or not
+              example: true
+            traffic:
+              type: integer
+              description: Maximum value in gigabytes that the server can use in terms of traffic (can be increased via support if exceeded)
+              example: 1000
+            curr_traffic:
+              type: number
+              format: double
+              description: Current traffic value in gigabytes
+              example: 273
+            online:
+              type: boolean
+              description: Value of whether the server is online
+              example: true
+            cpu_pc:
+              type: integer
+              description: Current cpu usage in percentage
+              example: 27
+            curr_memory:
+              type: integer
+              description: Current cpu usage in Gibibyte
+            addresses:
+              type: array
+              items:
+                $ref: '#/components/schemas/Address'
+    Address:
+      type: object
+      properties:
+        ip:
+          type: string
+          description: IPv4 address assigned to server
+          example: 123.123.123.123
+        rdns:
+          nullable: true
+          type: string
+          example: 123.123.123.123.mydomain.tld
+    MinecraftServerBackup:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Current status of backup
+          enum:
+            - done
+            - running
+        time:
+          type: string
+          example: 1624206633.5025601
+          description: Timestamp with nanoseconds
+        message:
+          type: string
+        file:
+          type: string
+          description: Backup archive file name
+          example: world.zip
+        ftp:
+          type: string
+          example: '123.123.123.123:21'
+        type:
+          type: string
+          example: world
+    TeamspeakServer:
+      allOf:
+        - $ref: '#/components/schemas/Product'
+        - $ref: '#/components/schemas/ProductName'
+        - type: object
+          properties:
+            servername:
+              type: string
+              description: Teamspeak server name
+              example: TeamSpeak3 Server by MC-Host24.de
+            ip_address:
+              type: string
+              example: s03.ts3clan.de
+              description: teamspeak server address
+            port:
+              type: integer
+              example: 9987
+              description: Teamspeak server port
+            slots:
+              type: integer
+              example: 100
+              description: Maximum usable slots
+              nullable: true
+            current_slots:
+              type: integer
+              example: 27
+              description: Clients connected to teamspeak server
+              nullable: true
+            online:
+              type: boolean
+              description: Teamspeak server status
+    Domain:
+      allOf:
+        - $ref: '#/components/schemas/Product'
+        - type: object
+          properties:
+            sld:
+              type: string
+              description: The second level domain name
+            tld:
+              type: string
+              description: The top level domain name
+    DomainRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id of domain recored
+          readOnly: true
+        sld:
+          type: string
+          description: Sld better known as subdomain
+          example: imap
+        type:
+          type: string
+          enum:
+            - A
+            - AAAA
+            - CNAME
+            - MX
+            - NS
+            - SRV
+            - TXT
+            - CAA
+            - HTTP_F
+            - HTTPS_F
+            - HTTP_H
+            - HTTPS_H
+          example: CNAME
+        target:
+          type: string
+          description: Target IP or TXT content etc.
+          example: cmail01.mailhost24.de.
+    DomainEmail:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The MC-HOST24 database id
+        service_id:
+          type: integer
+          description: The MC-HOST24 service id
+        service_ordered_at:
+          type: integer
+          description: Time at which the product was ordered
+        expire_at:
+          type: integer
+          description: Time at which the product should expire
+        expired_at:
+          type: integer
+          description: Time at which the product expired
+          nullable: true
+    ProductName:
+      type: object
+      description: The product name (can currently only be set via the my server page and only for services - not for domains and teamspeak server installed on a rootserver)
+      properties:
+        product_name:
+          type: string
+          nullable: true
+    Profile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: MC-HOST24 database id
+          example: 1
+        name:
+          type: string
+          description: Name of account
+          example: MyAccountName
+        rname:
+          type: string
+          description: Real name of account
+          example: MyAccountName
+        email:
+          type: string
+          description: Email of account
+          format: email
+          example: my@email.tld
+        money:
+          type: number
+          description: Current balance of account
+          format: float
+          example: 27.03
+    Discount:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: integer
+          description: Database id of discount
+          example: 1
+        discount_percent:
+          type: integer
+          description: Percentage value of the discount
+          example: 27
+        type:
+          type: string
+          enum:
+            - NEW
+            - RENEW
+            - UPGRADE
+          description: Discount type
+          example: RENEW
+        start_at:
+          type: string
+          format: date-time
+          description: Timestamp when the discount started
+        end_at:
+          type: string
+          format: date-time
+          description: Timestamp when the discount ends
+        discount_type:
+          type: string
+          enum:
+            - PERCENT
+            - LIMITED_OFFER
+          description: Represents the discount type
+          example: PERCENT
+    RootserverBackup:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: number
+        created_at:
+          type: number
+        finished:
+          type: boolean
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Ticket id from Database
+          example: 1
+        user_id:
+          type: number
+          description: User id of the opener
+          example: 1
+        col_id:
+          type: number
+          description: ID of the collaborator
+          example: 2
+        betr:
+          type: string
+          description: Subject of the ticket
+        msg:
+          type: string
+          description: Content of the ticket
+        state:
+          type: string
+          description: State of the ticket
+          enum:
+            - CLOSED
+            - OPENED
+        server_id:
+          type: number
+          description: Server id mentioned in the ticket
+          nullable: true
+        service_id:
+          type: number
+          description: Service id mentioned in the ticket
+          nullable: true
+        ticket_category_id:
+          type: string
+          nullable: true
+          description: Id of ticket category
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketAnswer'
+        pinned:
+          type: boolean
+          description: Is ticket pinned
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the ticket was created
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the ticket was updated
+    TicketAnswer:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Database id of ticket answer
+          example: 1
+        ticket_id:
+          type: number
+          description: Database id of reference ticket
+          example: 1
+        msg:
+          type: string
+          description: Content of answer
+        user_id:
+          type: number
+          nullable: true
+          description: User id who sent the reply
+        col_id:
+          type: number
+          nullable: true
+          description: ID of the collaborator who sent the reply
+        created_at:
+          type: string
+          nullable: true
+          format: date-time
+          description: Timestamp when the ticket was created
+        updated_at:
+          type: string
+          nullable: true
+          format: date-time
+          description: Timestamp when the ticket was updated
+    TicketCategory:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Database of ticket category
+        title:
+          type: string
+          description: Category title
+        description:
+          type: string
+          nullable: true
+          description: Category description
+        icon:
+          type: string
+          nullable: true
+          description: Category icon
+    Service:
+      allOf:
+        - $ref: '#/components/schemas/ProductName'
+        - type: object
+          properties:
+            id:
+              type: number
+              description: Database id of service
+              example: 1
+            user_id:
+              type: number
+              description: Database id of service owner
+              example: 1
+            ordered_at:
+              type: string
+              format: date-time
+              description: Timestamp the service was ordered
+            expire_at:
+              type: string
+              format: date-time
+              nullable: true
+              description: Timestamp when the service will expire
+            expired_at:
+              type: string
+              format: date-time
+              nullable: true
+              description: Timestamp when the service expired
+            service_id:
+              type: number
+              description: Database id of assosiated product
+            service_type:
+              type: string
+              description: Product type
+              enum:
+                - vserver
+                - domain
+                - minecraft_server
+                - teamspeak_server
+                - webspace
+                - gameserver
+                - sinusbot
+            product_pack:
+              type: number
+              description: Id of product_pack
+              nullable: true
+            price:
+              type: number
+              description: Custom price of product
+              nullable: true
+            created_at:
+              type: string
+              format: date-string
+              description: Timestamp when the service was created
+            updated_at:
+              type: string
+              format: date-string
+              description: Timestamp when the service was updated
+            deleted_at:
+              type: string
+              format: date-string
+              nullable: true
+              description: Timestamp when the service was deleted
+            product_id:
+              type: number
+              description: Database id of product
+            user_payment_method_id:
+              type: number
+              nullable: true
+  parameters:
+    rootserverId:
+      in: path
+      name: rootserverId
+      description: Database id of rootserver
+      required: true
+      example: 1
+      schema:
+        type: integer
+      allowEmptyValue: false
+    rootserverBackupId:
+      in: path
+      name: rootserverBackupId
+      description: Database id of rootserver backup
+      required: true
+      example: 1
+      schema:
+        type: integer
+      allowEmptyValue: false
+    minecraftServerId:
+      in: path
+      name: minecraftServerId
+      description: Database id of minecraft server
+      required: true
+      example: 1
+      schema:
+        type: integer
+      allowEmptyValue: false
+    teamspeakServerId:
+      in: path
+      name: teamspeakServerId
+      description: Database id of teamspeak server
+      required: true
+      example: 1
+      schema:
+        type: integer
+      allowEmptyValue: false
+    domainId:
+      in: path
+      name: domainId
+      description: Database id of domain
+      schema:
+        type: integer
+      required: true
+      example: 1
+      allowEmptyValue: false
+    domainRecordId:
+      in: path
+      name: domainRecordId
+      description: Database id of domain dns record
+      schema:
+        type: integer
+      required: true
+      example: 1
+      allowEmptyValue: false
+    domainEmailId:
+      in: path
+      name: domainEmailId
+      description: Database id of domain email
+      schema:
+        type: integer
+      required: true
+      example: 1
+      allowEmptyValue: false
+    ticketId:
+      in: path
+      name: ticketId
+      description: Database id of ticket
+      schema:
+        type: integer
+      required: true
+      example: 1
+      allowEmptyValue: false
+    serviceId:
+      in: path
+      name: serviceId
+      description: Database id of service
+      schema:
+        type: integer
+      required: true
+      example: 1
+      allowEmptyValue: false
