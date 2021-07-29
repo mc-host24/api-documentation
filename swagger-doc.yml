@@ -1329,6 +1329,11 @@ components:
           description: Current balance of account
           format: float
           example: 27.03
+        donation_url: 
+          type: string
+          description: Donate url if set
+          nullable: true
+          example: https://mc-host24.de/donate/MyAccountName
     Discount:
       type: object
       nullable: true
