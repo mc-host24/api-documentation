@@ -5,7 +5,7 @@ info:
   title: MC-HOST24 Public API
   termsOfService: 'https://mc-host24.de/agb'
   contact:
-    email: sergej.kembel@mc-host24.de
+    email: admin@mc-host24.de
 servers:
   - description: Production API
     url: 'https://mc-host24.de/api/v1'
